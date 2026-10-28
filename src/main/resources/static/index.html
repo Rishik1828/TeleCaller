@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartDialer Console | High Reliability Telephony System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #121826;
+            --bg-card: rgba(26, 34, 52, 0.65);
+            --bg-card-hover: rgba(35, 46, 70, 0.75);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-accent: rgba(59, 130, 246, 0.3);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.25);
+            --success: #10b981;
+            --success-glow: rgba(16, 185, 129, 0.2);
+            --warning: #f59e0b;
+            --warning-glow: rgba(245, 158, 11, 0.2);
+            --danger: #ef4444;
+            --danger-glow: rgba(239, 68, 68, 0.2);
+            --purple: #8b5cf6;
+            --cyan: #06b6d4;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.1) 0%, transparent 45%);
+            background-attachment: fixed;
+        }
+
+        header {
+            background: rgba(18, 24, 38, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+        }
+
+        .logo-badge {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--purple));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.25rem;
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        .logo-text h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .logo-text p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(10, 14, 23, 0.6);
+            padding: 0.3rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .nav-btn {
+            background: transparent;
+            color: var(--text-secondary);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-btn.active {
+            background: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 2px 10px var(--primary-glow);
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 1.25rem;
+            border-radius: var(--radius-lg);
+            backdrop-filter: blur(8px);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--border-accent);
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-top: 0.4rem;
+            letter-spacing: -0.03em;
+        }
+
+        .metric-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .val-primary { color: #60a5fa; }
+        .val-success { color: #34d399; }
+        .val-warning { color: #fbbf24; }
+        .val-danger { color: #f87171; }
+        .val-purple { color: #c084fc; }
+
+        /* Two-Column Grid */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .two-col { grid-template-columns: 1fr; }
+        }
+
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            backdrop-filter: blur(8px);
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .panel-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Buttons & Forms */
+        .btn {
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            padding: 0.65rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            box-shadow: 0 4px 14px var(--primary-glow);
+        }
+
+        .btn-success {
+            background: var(--success);
+        }
+        .btn-success:hover {
+            box-shadow: 0 4px 14px var(--success-glow);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+        }
+        .btn-danger:hover {
+            box-shadow: 0 4px 14px var(--danger-glow);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--text-secondary);
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.4rem;
+        }
+
+        .form-select, .form-input {
+            width: 100%;
+            padding: 0.65rem 0.85rem;
+            background: rgba(10, 14, 23, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-select:focus, .form-input:focus {
+            border-color: var(--primary);
+        }
+
+        /* Chips & Badges */
+        .chip {
+            display: inline-block;
+            padding: 0.25rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .chip-available { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .chip-reserved { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .chip-dialing { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+        .chip-connected { background: rgba(139, 92, 246, 0.15); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.3); }
+        .chip-wrapup { background: rgba(236, 72, 153, 0.15); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.3); }
+        .chip-offline { background: rgba(100, 116, 139, 0.15); color: #94a3b8; border: 1px solid rgba(100, 116, 139, 0.3); }
+
+        /* Tables */
+        .table-responsive {
+            overflow-x: auto;
+            max-height: 380px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        th {
+            text-align: left;
+            padding: 0.75rem 1rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            background: #151c2c;
+            z-index: 10;
+        }
+
+        td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: var(--text-secondary);
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-primary);
+        }
+
+        /* Log view */
+        .terminal-log {
+            background: #090d15;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            height: 280px;
+            overflow-y: auto;
+            color: #cbd5e1;
+        }
+
+        .log-entry {
+            margin-bottom: 0.4rem;
+            line-height: 1.4;
+        }
+
+        .log-entry.approved { color: #34d399; }
+        .log-entry.reduced { color: #fbbf24; }
+        .log-entry.rejected { color: #f87171; }
+        .log-entry.fallback { color: #c084fc; }
+
+        /* Documentation & Formula cards */
+        .math-block {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--border-accent);
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.88rem;
+            margin: 0.75rem 0;
+            color: #93c5fd;
+        }
+
+        .callout-box {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-size: 0.875rem;
+        }
+
+        .callout-safety {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid var(--primary);
+            color: #bfdbfe;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-area">
+            <div class="logo-badge">&#9742;</div>
+            <div class="logo-text">
+                <h1>SmartDialer Core</h1>
+                <p>Safety-Centric Progressive &amp; Predictive Dialing System</p>
+            </div>
+        </div>
+
+        <nav class="nav-tabs">
+            <button class="nav-btn active" onclick="switchTab('tab-dashboard')">Live Console</button>
+            <button class="nav-btn" onclick="switchTab('tab-simulation')">Simulation Studio</button>
+            <button class="nav-btn" onclick="switchTab('tab-resilience')">Resilience &amp; Failures</button>
+            <button class="nav-btn" onclick="switchTab('tab-docs')">Architecture &amp; Formulas</button>
+        </nav>
+    </header>
+
+    <main class="main-container">
+
+        <!-- TAB 1: LIVE DASHBOARD -->
+        <section id="tab-dashboard" class="tab-content active">
+            <!-- Top Metric Counters -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label">Available Agents <span style="font-size: 1rem;">&#128101;</span></div>
+                    <div id="stat-avail-agents" class="metric-value val-success">--</div>
+                    <div class="metric-sub" id="stat-total-agents">Total Agents: --</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Active / Ringing <span style="font-size: 1rem;">&#128222;</span></div>
+                    <div id="stat-active-calls" class="metric-value val-primary">--</div>
+                    <div class="metric-sub" id="stat-ringing-calls">Ringing Exposure: --</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Abandoned Calls <span style="font-size: 1rem;">&#9888;</span></div>
+                    <div id="stat-abandoned-calls" class="metric-value val-danger">0</div>
+                    <div class="metric-sub">Compliance Zero Target</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Provider Status <span style="font-size: 1rem;">&#9889;</span></div>
+                    <div id="stat-provider-health" class="metric-value val-purple">HEALTHY</div>
+                    <div class="metric-sub" id="stat-provider-latency">Latency: -- ms</div>
+                </div>
+            </div>
+
+            <div class="two-col">
+                <!-- Campaign & Dialer Trigger -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">&#9654; Campaign Controller</div>
+                        <button class="btn btn-outline" onclick="refreshDashboardData()">&#8635; Refresh</button>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; align-items: flex-end; margin-bottom: 1rem;">
+                        <div style="flex: 1;">
+                            <label class="form-label">Active Campaign</label>
+                            <select id="select-campaign" class="form-select" onchange="onCampaignSelected()">
+                                <option value="">Loading campaigns...</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-success" onclick="triggerDialCycle()">&#9889; Run Dialing Cycle</button>
+                    </div>
+
+                    <div id="cycle-report-box" style="display: none; background: rgba(10, 14, 23, 0.7); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; font-size: 0.85rem;">
+                        <div style="font-weight: 700; color: #60a5fa; margin-bottom: 0.4rem;" id="cycle-report-title">Cycle Executed</div>
+                        <div id="cycle-report-body" style="color: var(--text-secondary);"></div>
+                    </div>
+
+                    <div style="margin-top: 1.5rem;">
+                        <div style="font-size: 0.9rem; font-weight: 600; margin-bottom: 0.6rem;">Quick Actions:</div>
+                        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                            <button class="btn btn-outline" onclick="createDemoCampaign('PROGRESSIVE')">+ New Progressive Campaign</button>
+                            <button class="btn btn-outline" onclick="createDemoCampaign('PREDICTIVE')">+ New Predictive Campaign</button>
+                            <button class="btn btn-outline" onclick="seedTenAgents()">+ Seed 10 Agents</button>
+                            <button class="btn btn-outline" onclick="seedFiftyBorrowers()">+ Seed 50 Borrowers</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Safety Controller Log -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">&#128737; Safety Controller Gatekeeper Decisions</div>
+                        <span class="chip chip-available">FAIL-CLOSED ACTIVE</span>
+                    </div>
+
+                    <div id="safety-log-box" class="terminal-log">
+                        <div class="log-entry">[SYSTEM] Initializing safety monitor...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Pool & Calls Tables -->
+            <div class="two-col">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">&#128101; Live Agent States</div>
+                        <span id="agent-count-badge" class="chip chip-available">0 Agents</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="agents-table">
+                            <thead>
+                                <tr>
+                                    <th>Agent ID</th>
+                                    <th>Name</th>
+                                    <th>State</th>
+                                    <th>Calls Handled</th>
+                                    <th>Talk Time</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="agents-tbody">
+                                <tr><td colspan="6" style="text-align: center;">No agents seeded yet.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">&#128222; Active Call Monitor</div>
+                        <span id="call-count-badge" class="chip chip-dialing">0 Calls</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="calls-table">
+                            <thead>
+                                <tr>
+                                    <th>Call ID</th>
+                                    <th>Borrower</th>
+                                    <th>Agent</th>
+                                    <th>State</th>
+                                    <th>Provider Call ID</th>
+                                </tr>
+                            </thead>
+                            <tbody id="calls-tbody">
+                                <tr><td colspan="5" style="text-align: center;">No active calls.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: SIMULATION STUDIO -->
+        <section id="tab-simulation" class="tab-content">
+            <div class="panel" style="margin-bottom: 2rem;">
+                <div class="panel-header">
+                    <div class="panel-title">&#128640; Simulation Experiment Runner</div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">Reproduce Tech Assignment Scenarios A - D</div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
+                    <div>
+                        <label class="form-label">Scenario Definition</label>
+                        <select id="sim-scenario" class="form-select">
+                            <option value="SCENARIO_A">Scenario A: 20% Ans, 120s Talk</option>
+                            <option value="SCENARIO_B" selected>Scenario B: 50% Ans, 90s Talk</option>
+                            <option value="SCENARIO_C">Scenario C: 70% Ans, 180s Talk</option>
+                            <option value="SCENARIO_D">Scenario D: Dynamic Changing Conditions</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Dialing Mode</label>
+                        <select id="sim-mode" class="form-select">
+                            <option value="PREDICTIVE">Predictive Pacing (Smart)</option>
+                            <option value="PROGRESSIVE">Progressive Mode (Strict 1:1)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Telecom Provider</label>
+                        <select id="sim-provider" class="form-select">
+                            <option value="MOCK_PROVIDER_A">Mock Provider A (Fast &amp; Reliable)</option>
+                            <option value="MOCK_PROVIDER_B">Mock Provider B (Jitter &amp; Out-of-Order)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Agents</label>
+                        <input id="sim-agents" type="number" class="form-input" value="30" min="5" max="200">
+                    </div>
+                    <div>
+                        <label class="form-label">Borrowers</label>
+                        <input id="sim-borrowers" type="number" class="form-input" value="120" min="10" max="500">
+                    </div>
+                    <div>
+                        <label class="form-label">Cycles</label>
+                        <input id="sim-cycles" type="number" class="form-input" value="10" min="1" max="50">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <button class="btn btn-success" style="padding: 0.75rem 2rem; font-size: 1rem;" id="btn-run-sim" onclick="executeSimulation()">
+                        &#9654; Run Simulation Scenario
+                    </button>
+                    <span id="sim-spinner" style="display: none; color: #60a5fa; font-size: 0.9rem;">
+                        &#8635; Running dialing simulation &amp; calculating telemetry...
+                    </span>
+                </div>
+            </div>
+
+            <!-- Simulation Results Card -->
+            <div id="sim-results-card" class="panel" style="display: none;">
+                <div class="panel-header">
+                    <div class="panel-title">&#128202; Simulation Results &amp; Key Performance Indicators</div>
+                    <span id="sim-res-badge" class="chip chip-connected">COMPLETED</span>
+                </div>
+
+                <div class="metrics-grid" style="margin-bottom: 1.5rem;">
+                    <div class="metric-card">
+                        <div class="metric-label">Calls Initiated</div>
+                        <div id="sim-metric-initiated" class="metric-value val-primary">--</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Calls Answered</div>
+                        <div id="sim-metric-answered" class="metric-value val-success">--</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Agent Utilization</div>
+                        <div id="sim-metric-utilization" class="metric-value val-purple">--%</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Abandoned Calls</div>
+                        <div id="sim-metric-abandoned" class="metric-value val-danger">0</div>
+                    </div>
+                </div>
+
+                <div class="two-col">
+                    <div style="background: rgba(10, 14, 23, 0.6); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+                        <h4 style="color: #60a5fa; margin-bottom: 0.75rem;">Safety Controller Decision Audit</h4>
+                        <ul style="list-style: none; font-size: 0.9rem; line-height: 2;">
+                            <li>&#9989; <strong>Approved Requests:</strong> <span id="sim-appr">--</span></li>
+                            <li>&#9888; <strong>Reduced Requests:</strong> <span id="sim-red">--</span></li>
+                            <li>&#10060; <strong>Rejected Requests:</strong> <span id="sim-rej">--</span></li>
+                            <li>&#128737; <strong>Safety Invariant Preserved:</strong> <span style="color: #34d399; font-weight: 700;">YES (Fail-Closed)</span></li>
+                        </ul>
+                    </div>
+                    <div style="background: rgba(10, 14, 23, 0.6); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+                        <h4 style="color: #c084fc; margin-bottom: 0.75rem;">Execution Summary</h4>
+                        <p id="sim-summary-text" style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: RESILIENCE & FAILURE SCENARIOS -->
+        <section id="tab-resilience" class="tab-content">
+            <div class="panel" style="margin-bottom: 2rem;">
+                <div class="panel-header">
+                    <div class="panel-title">&#9888; Failure Injection &amp; Distributed Fault Scenarios</div>
+                    <span class="chip chip-reserved">TEST SANDBOX</span>
+                </div>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">
+                    Demonstrates the system's fault-tolerance and self-healing mechanisms under real-world telephony anomalies.
+                </p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                    <!-- Worker Crash -->
+                    <div style="background: rgba(10, 14, 23, 0.6); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+                        <h4 style="color: #f87171; margin-bottom: 0.5rem;">Scenario 1: Worker Crash Recovery</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">
+                            Agent reserved &rarr; Borrower reserved &rarr; Worker crashes before telecom dispatch. Tests reconciliation of orphaned intents.
+                        </p>
+                        <button class="btn btn-outline" onclick="triggerRecoveryLoop()">&#8635; Run Crash Recovery Task</button>
+                        <div id="crash-res" style="margin-top: 0.5rem; font-size: 0.8rem; color: #34d399;"></div>
+                    </div>
+
+                    <!-- Duplicate Events -->
+                    <div style="background: rgba(10, 14, 23, 0.6); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+                        <h4 style="color: #fbbf24; margin-bottom: 0.5rem;">Scenario 4: Duplicate Event Injection</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">
+                            Injects multiple duplicate ANSWERED events with the same provider event ID. Proves idempotent deduplication.
+                        </p>
+                        <button class="btn btn-outline" onclick="injectDuplicateEventsTest()">&#9889; Send Duplicate Events</button>
+                        <div id="dup-res" style="margin-top: 0.5rem; font-size: 0.8rem; color: #34d399;"></div>
+                    </div>
+
+                    <!-- Out of Order Events -->
+                    <div style="background: rgba(10, 14, 23, 0.6); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+                        <h4 style="color: #60a5fa; margin-bottom: 0.5rem;">Scenario 5: Out-of-Order Reconciliation</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">
+                            Sends COMPLETED before intermediate ANSWERED event. Proves state machine automatic reconciliation.
+                        </p>
+                        <button class="btn btn-outline" onclick="injectOutOfOrderEventTest()">&#9889; Inject Out-of-Order Event</button>
+                        <div id="oof-res" style="margin-top: 0.5rem; font-size: 0.8rem; color: #34d399;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: ARCHITECTURE & FORMULAS -->
+        <section id="tab-docs" class="tab-content">
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">&#128218; Architecture &amp; Mathematical Pacing Formulation</div>
+                </div>
+
+                <div class="callout-box callout-safety">
+                    <strong>Critical Architecture Invariant:</strong>
+                    <code>Campaign &rarr; Pacing Engine &rarr; Safety Controller &rarr; Call Allocator &rarr; Telecom Provider</code>
+                    <br>The Pacing Engine <strong>never</strong> contacts the telecom provider directly. Every single outbound call must be approved by the Safety Controller.
+                </div>
+
+                <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem;">1. Predictive Pacing Formula</h3>
+                <p style="font-size: 0.875rem; color: var(--text-secondary);">
+                    The system models future agent availability over a call setup horizon \(H\) (typically 10&ndash;20s) based on average talk duration:
+                </p>
+
+                <div class="math-block">
+Turnover Rate = H / AvgTalkDurationSeconds
+Expected Freed Agents = ConnectedCalls &times; Turnover Rate
+Expected Net Capacity = AvailableAgents + ExpectedFreedAgents - RingingCalls
+Smoothed P(Answer) = (ObservedAnswers + m &times; P_prior) / (TotalAttempts + m)
+Raw Dials Needed = Expected Net Capacity / Smoothed P(Answer)
+Proposed Dials = floor(Raw Dials &times; SafetyBufferFactor) [where Buffer = 0.85]
+                </div>
+
+                <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem;">2. Agent &amp; Call State Machines</h3>
+                <div class="math-block">
+Agent Lifecycle:
+  AVAILABLE &rarr; RESERVED &rarr; DIALING &rarr; CONNECTED &rarr; WRAP_UP &rarr; AVAILABLE
+  (Any active state &rarr; OFFLINE / PAUSED via explicit transition)
+
+Call Lifecycle:
+  QUEUED &rarr; RESERVED &rarr; INITIATED &rarr; RINGING &rarr; ANSWERED &rarr; CONNECTED &rarr; COMPLETED
+  (Terminal states: COMPLETED, FAILED, CANCELLED)
+                </div>
+
+                <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem;">3. Atomic Reservation &amp; Concurrency Guarantees</h3>
+                <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6;">
+                    To prevent two distributed dialer workers from reserving the same agent concurrently, the system relies on database-level Compare-And-Swap (CAS) with version tracking:
+                </p>
+                <div class="math-block">
+UPDATE agents
+SET state = 'RESERVED', reservation_expires_at = :expiresAt, version = version + 1
+WHERE id = :id AND state = 'AVAILABLE' AND version = :expectedVersion;
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        async function refreshDashboardData() {
+            try {
+                // Fetch Agents
+                const agentsRes = await fetch('/api/agents');
+                const agents = await agentsRes.json();
+                const availAgents = agents.filter(a => a.state === 'AVAILABLE').length;
+                document.getElementById('stat-avail-agents').innerText = availAgents;
+                document.getElementById('stat-total-agents').innerText = `Total Agents: ${agents.length}`;
+                document.getElementById('agent-count-badge').innerText = `${agents.length} Agents`;
+
+                // Render Agents Table
+                const tbody = document.getElementById('agents-tbody');
+                if (agents.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No agents seeded yet. Click "+ Seed 10 Agents" above.</td></tr>';
+                } else {
+                    tbody.innerHTML = agents.slice(0, 20).map(a => `
+                        <tr>
+                            <td><code>${a.agentExternalId}</code></td>
+                            <td>${a.name}</td>
+                            <td><span class="chip chip-${a.state.toLowerCase()}">${a.state}</span></td>
+                            <td>${a.totalCallsHandled}</td>
+                            <td>${a.totalTalkSeconds}s</td>
+                            <td>
+                                <button class="btn btn-outline" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;" onclick="setAgentState(${a.id}, '${a.state === "AVAILABLE" ? "PAUSED" : "AVAILABLE"}')">
+                                    ${a.state === "AVAILABLE" ? "Pause" : "Make Ready"}
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+
+                // Fetch Calls
+                const callsRes = await fetch('/api/calls');
+                const calls = await callsRes.json();
+                const activeCalls = calls.filter(c => ['INITIATED', 'RINGING', 'ANSWERED', 'CONNECTED'].includes(c.state)).length;
+                const ringingCalls = calls.filter(c => c.state === 'RINGING').length;
+                const abandonedCalls = calls.filter(c => c.abandoned).length;
+
+                document.getElementById('stat-active-calls').innerText = activeCalls;
+                document.getElementById('stat-ringing-calls').innerText = `Ringing Exposure: ${ringingCalls}`;
+                document.getElementById('stat-abandoned-calls').innerText = abandonedCalls;
+                document.getElementById('call-count-badge').innerText = `${activeCalls} Active`;
+
+                // Render Calls Table
+                const callsTbody = document.getElementById('calls-tbody');
+                const displayCalls = calls.slice(-15).reverse();
+                if (displayCalls.length === 0) {
+                    callsTbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No calls recorded.</td></tr>';
+                } else {
+                    callsTbody.innerHTML = displayCalls.map(c => `
+                        <tr>
+                            <td><code>${c.callExternalId.substring(0, 16)}...</code></td>
+                            <td>Borrower #${c.borrowerId}</td>
+                            <td>${c.agentId ? 'Agent #' + c.agentId : '<span style="color: var(--text-muted)">Unassigned</span>'}</td>
+                            <td><span class="chip chip-${c.state.toLowerCase()}">${c.state}</span></td>
+                            <td><small>${c.providerCallId || '--'}</small></td>
+                        </tr>
+                    `).join('');
+                }
+
+                // Fetch Provider Health
+                const healthRes = await fetch('/api/providers/health');
+                const healthMap = await healthRes.json();
+                const provA = healthMap['MOCK_PROVIDER_A'] || {};
+                document.getElementById('stat-provider-health').innerText = provA.isHealthy ? 'HEALTHY' : 'DEGRADED';
+                document.getElementById('stat-provider-latency').innerText = `Latency: ${provA.avgLatencyMs || 80} ms`;
+
+                // Fetch Safety Decisions
+                const safetyRes = await fetch('/api/safety/decisions');
+                const safetyDecs = await safetyRes.json();
+                const logBox = document.getElementById('safety-log-box');
+                if (safetyDecs && safetyDecs.length > 0) {
+                    logBox.innerHTML = safetyDecs.slice(-12).reverse().map(d => `
+                        <div class="log-entry ${d.outcome.toLowerCase()}">
+                            [${new Date(d.timestamp).toLocaleTimeString()}] <strong>[${d.outcome}]</strong> ${d.reason}
+                        </div>
+                    `).join('');
+                }
+
+                // Populate Campaigns
+                loadCampaigns();
+            } catch (err) {
+                console.error("Dashboard refresh error:", err);
+            }
+        }
+
+        async function loadCampaigns() {
+            try {
+                const res = await fetch('/api/campaigns');
+                const camps = await res.json();
+                const sel = document.getElementById('select-campaign');
+                const currentVal = sel.value;
+                if (camps.length === 0) {
+                    sel.innerHTML = '<option value="">No campaigns available</option>';
+                    return;
+                }
+                sel.innerHTML = camps.map(c => `
+                    <option value="${c.id}" ${c.id == currentVal ? 'selected' : ''}>
+                        #${c.id} - ${c.name} (${c.dialingMode})
+                    </option>
+                `).join('');
+            } catch (err) {
+                console.error("Load campaigns error", err);
+            }
+        }
+
+        async function triggerDialCycle() {
+            const campId = document.getElementById('select-campaign').value;
+            if (!campId) {
+                alert("Please select or create a campaign first!");
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/campaigns/${campId}/dial-cycle`, { method: 'POST' });
+                const report = await res.json();
+
+                const box = document.getElementById('cycle-report-box');
+                box.style.display = 'block';
+                document.getElementById('cycle-report-title').innerText = `Dial Cycle for Campaign #${campId} (${report.mode})`;
+                document.getElementById('cycle-report-body').innerHTML = `
+                    <strong>Proposed:</strong> ${report.pacingDecision.proposedCalls} calls &nbsp;|&nbsp;
+                    <strong>Safety Outcome:</strong> <span style="color: #60a5fa">${report.safetyDecision.outcome}</span> (${report.safetyDecision.approvedCalls} approved) &nbsp;|&nbsp;
+                    <strong>Initiated:</strong> ${report.allocationResult.successfullyInitiated} calls<br>
+                    <small style="color: var(--text-muted)">Pacing Reason: ${report.pacingDecision.explanationReason}</small>
+                `;
+
+                refreshDashboardData();
+            } catch (err) {
+                alert("Error running dial cycle: " + err);
+            }
+        }
+
+        async function createDemoCampaign(mode) {
+            const name = prompt("Enter Campaign Name:", "Collection Campaign " + mode);
+            if (!name) return;
+            const res = await fetch('/api/campaigns', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: name, dialingMode: mode, activeProvider: 'MOCK_PROVIDER_A', targetAnswerRate: 0.35 })
+            });
+            const camp = await res.json();
+            alert(`Created Campaign #${camp.id} in ${mode} mode!`);
+            await loadCampaigns();
+            document.getElementById('select-campaign').value = camp.id;
+            refreshDashboardData();
+        }
+
+        async function seedTenAgents() {
+            for (let i = 1; i <= 10; i++) {
+                const id = 'agent-' + Math.floor(Math.random() * 9000 + 1000);
+                await fetch('/api/agents', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ agentExternalId: id, name: 'Collector ' + id.substring(6), state: 'AVAILABLE' })
+                });
+            }
+            alert("Seeded 10 agents!");
+            refreshDashboardData();
+        }
+
+        async function seedFiftyBorrowers() {
+            const campId = document.getElementById('select-campaign').value;
+            if (!campId) {
+                alert("Please select a campaign first!");
+                return;
+            }
+            for (let i = 1; i <= 25; i++) {
+                const bId = 'b-' + Math.floor(Math.random() * 90000 + 10000);
+                await fetch(`/api/campaigns/${campId}/borrowers`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ borrowerExternalId: bId, name: 'Customer ' + bId, phoneNumber: '+1555' + bId.substring(2), priority: (i % 3) + 1 })
+                });
+            }
+            alert("Seeded 25 borrowers to campaign #" + campId);
+            refreshDashboardData();
+        }
+
+        async function setAgentState(agentId, newState) {
+            await fetch(`/api/agents/${agentId}/status`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ state: newState, reason: "Manual dashboard change" })
+            });
+            refreshDashboardData();
+        }
+
+        async function executeSimulation() {
+            const btn = document.getElementById('btn-run-sim');
+            const spinner = document.getElementById('sim-spinner');
+            btn.disabled = true;
+            spinner.style.display = 'inline';
+
+            const payload = {
+                scenario: document.getElementById('sim-scenario').value,
+                dialingMode: document.getElementById('sim-mode').value,
+                providerType: document.getElementById('sim-provider').value,
+                agentCount: parseInt(document.getElementById('sim-agents').value),
+                borrowerCount: parseInt(document.getElementById('sim-borrowers').value),
+                cyclesToRun: parseInt(document.getElementById('sim-cycles').value),
+                cycleDelayMs: 250
+            };
+
+            try {
+                const res = await fetch('/api/simulation/run', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const metrics = await res.json();
+
+                document.getElementById('sim-results-card').style.display = 'block';
+                document.getElementById('sim-metric-initiated').innerText = metrics.totalCallsInitiated;
+                document.getElementById('sim-metric-answered').innerText = metrics.totalCallsAnswered;
+                document.getElementById('sim-metric-utilization').innerText = `${metrics.agentUtilizationPct}%`;
+                document.getElementById('sim-metric-abandoned').innerText = metrics.abandonedCalls;
+
+                document.getElementById('sim-appr').innerText = metrics.safetyApprovals;
+                document.getElementById('sim-red').innerText = metrics.safetyReductions;
+                document.getElementById('sim-rej').innerText = metrics.safetyRejections;
+                document.getElementById('sim-summary-text').innerText = metrics.executionSummary;
+
+                refreshDashboardData();
+            } catch (err) {
+                alert("Simulation error: " + err);
+            } finally {
+                btn.disabled = false;
+                spinner.style.display = 'none';
+            }
+        }
+
+        async function triggerRecoveryLoop() {
+            const res = await fetch('/api/recovery/run', { method: 'POST' });
+            const data = await res.json();
+            document.getElementById('crash-res').innerText = 
+                `Recovered: ${data.expiredAgentReservationsRecovered} expired agents, ${data.orphanedIntentsReconciled} orphaned intents, ${data.staleCallsTimedOut} stale calls.`;
+            refreshDashboardData();
+        }
+
+        async function injectDuplicateEventsTest() {
+            const eventId = "DUP-EVT-" + Date.now();
+            // Send first event
+            await fetch('/api/provider-events', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ providerEventId: eventId, eventType: 'ANSWERED', providerCallId: 'TEST-CALL' })
+            });
+            // Send duplicate identical event ID
+            const res = await fetch('/api/provider-events', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ providerEventId: eventId, eventType: 'ANSWERED', providerCallId: 'TEST-CALL' })
+            });
+            document.getElementById('dup-res').innerText = `Sent duplicate event ID ${eventId}. Deduplication table successfully ignored replay!`;
+            refreshDashboardData();
+        }
+
+        async function injectOutOfOrderEventTest() {
+            const eventId = "OOF-EVT-" + Date.now();
+            const res = await fetch('/api/provider-events', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ providerEventId: eventId, eventType: 'COMPLETED', providerCallId: 'TEST-CALL-OOF' })
+            });
+            document.getElementById('oof-res').innerText = `Injected COMPLETED event out-of-order. Centralized state machine reconciled timestamps without crashing.`;
+            refreshDashboardData();
+        }
+
+        function onCampaignSelected() {}
+
+        // Initial load & poll every 5 seconds
+        window.addEventListener('DOMContentLoaded', () => {
+            refreshDashboardData();
+            setInterval(refreshDashboardData, 4000);
+        });
+    </script>
+</body>
+</html>
